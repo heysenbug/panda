@@ -2,9 +2,9 @@
 // master -> panda DMA start
 void llspi_mosi_dma(uint8_t *addr, int len) {
   // disable DMA + SPI
-  register_clear_bits(&(SPI1->CFG1), SPI_CFG1_RXDMAEN);
   DMA2_Stream2->CR &= ~DMA_SxCR_EN;
   register_clear_bits(&(SPI1->CR1), SPI_CR1_SPE);
+  register_clear_bits(&(SPI1->CFG1), SPI_CFG1_RXDMAEN);
 
   // drain the bus
   while ((SPI1->SR & SPI_SR_RXP) != 0U) {
@@ -21,8 +21,8 @@ void llspi_mosi_dma(uint8_t *addr, int len) {
   DMA2_Stream2->NDTR = len;
 
   // enable DMA + SPI
-  DMA2_Stream2->CR |= DMA_SxCR_EN;
   register_set_bits(&(SPI1->CFG1), SPI_CFG1_RXDMAEN);
+  DMA2_Stream2->CR |= DMA_SxCR_EN;
   register_set_bits(&(SPI1->CR1), SPI_CR1_SPE);
 }
 
@@ -30,8 +30,8 @@ void llspi_mosi_dma(uint8_t *addr, int len) {
 void llspi_miso_dma(uint8_t *addr, int len) {
   // disable DMA + SPI
   DMA2_Stream3->CR &= ~DMA_SxCR_EN;
-  register_clear_bits(&(SPI1->CFG1), SPI_CFG1_TXDMAEN);
   register_clear_bits(&(SPI1->CR1), SPI_CR1_SPE);
+  register_clear_bits(&(SPI1->CFG1), SPI_CFG1_TXDMAEN);
 
   // setup source and length
   register_set(&(DMA2_Stream3->M0AR), (uint32_t)addr, 0xFFFFFFFFU);
